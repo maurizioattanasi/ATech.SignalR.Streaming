@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ATech.SignalR.Streaming.Grpc.Services;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
@@ -26,6 +27,14 @@ namespace ATech.SignalR.Streaming.Grpc
             {
                 Message = "Hello " + request.Name
             };
+        }
+
+        public override async Task<HelloReply> Start(Empty request, ServerCallContext context)
+        {
+            return await Task.Run(()=> new HelloReply
+            {
+                Message = "Hello"
+            });
         }
     }
 }
