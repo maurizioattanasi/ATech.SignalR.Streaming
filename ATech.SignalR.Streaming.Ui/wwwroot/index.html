@@ -24,21 +24,22 @@
 
     <script>
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/atechProcessHub")
+            .withUrl("http://localhost:5000/atechProcessHub")
             .build();
 
         function getUsers() {
-            connection.on("GetUsers", 50).subscribe({
-                next: (item) => {
-                    console.log(item);
-                },
-                complete: () => {
-                    console.log("Done!");
-                },
-                error: (err) => {
-                    console.error(err);
-                }
-            });
+            connection.stream("GetUsers", 50)
+                .subscribe({
+                    next: (item) => {
+                        console.log(item);
+                    },
+                    complete: () => {
+                        console.log("Done!");
+                    },
+                    error: (err) => {
+                        console.error(err);
+                    }
+                });
         }
 
         setTimeout(() => {
@@ -51,7 +52,7 @@
                 await connection.start();
             }
             catch (e) {
-                console.log("Error!");
+                console.log(e.toString());
             }
         })();
     </script>

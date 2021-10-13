@@ -11,8 +11,9 @@
             "preLaunchTask": "build",
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "url": "http://localhost:6000"
+            },            
+            "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+            "cwd": "${workspaceFolder}/ATech.SignalR.Streaming.Ui"
         },
         {
             "name": ".NET Core Launch (web)",
