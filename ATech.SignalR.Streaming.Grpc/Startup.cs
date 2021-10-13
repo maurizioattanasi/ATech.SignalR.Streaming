@@ -20,14 +20,9 @@ namespace ATech.SignalR.Streaming.Grpc
         {
             services.AddHttpClient();
 
-            services.AddSignalR()
-                .AddHubOptions<StreamHub>(config =>
-                {
-                    config.EnableDetailedErrors = true;
-                })
-                .AddJsonProtocol(); ;
+            services.AddSignalR();
 
-            services.AddScoped<RandomUserService>();
+            services.AddSingleton<RandomUserService>();
 
             services.AddCors(options =>
             {
@@ -57,8 +52,8 @@ namespace ATech.SignalR.Streaming.Grpc
 
             app.UseEndpoints(endpoints =>
             {
-                // endpoints.MapHub<ATechProcessHub>("/atechProcessHub");
-                endpoints.MapHub<StreamHub>("/streamHub");
+                endpoints.MapHub<ATechProcessHub>("/atechProcessHub");
+                //endpoints.MapHub<StreamHub>("/streamHub");
 
                 endpoints.MapGrpcService<GreeterService>();
 

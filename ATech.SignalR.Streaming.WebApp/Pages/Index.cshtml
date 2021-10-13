@@ -23,10 +23,26 @@
 <script>
 
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:5001/streamHub")
+        //.withUrl("https://localhost:5001/streamHub")
+        .withUrl("https://localhost:5001/atechProcessHub")
         .build();
 
-    function streamsCounter() {
+    function streamUsers() {
+        connection.stream("GetUsers", 1000).subscribe({
+            next: (item) => {
+                var user = JSON.stringify(item);
+                console.log(user);
+            },
+            complete: () => {
+                console.log("Done!");
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
+    };
+
+    function streamCounter() {
         connection.stream("Counter", 1000, 1).subscribe({
             next: (item) => {
                 console.log(item);
@@ -38,11 +54,12 @@
                 console.error(err);
             }
         });
-
     };
 
     setTimeout(() => {
-        streamsCounter();
+        //streamCounter();
+        streamUsers();
+
     }, 1000);
 
     (async () => {

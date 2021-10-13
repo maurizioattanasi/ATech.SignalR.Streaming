@@ -20,11 +20,11 @@ namespace ATech.SignalR.Streaming.Grpc
         public override async Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
         {
             var randomUser = await randomUserService.GetUser();
-            var user = randomUser.Results.FirstOrDefault();
+            var user = randomUser;
 
             return new HelloReply
             {
-                Message = "Hello " + request.Name + $" I'm {user?.Name.Title} {user?.Name.First} {user?.Name.Last}"
+                Message = "Hello " + request.Name
             };
         }
     }

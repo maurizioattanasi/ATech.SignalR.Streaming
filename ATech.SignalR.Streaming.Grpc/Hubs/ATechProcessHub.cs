@@ -9,13 +9,6 @@ using Microsoft.Extensions.Logging;
 
 namespace ATech.SignalR.Streaming.Grpc.Hubs
 {
-    public class User
-    {
-        public string Title { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
-    
     public class ATechProcessHub : Hub
     {
         private readonly RandomUserService randomUserService;
@@ -30,35 +23,48 @@ namespace ATech.SignalR.Streaming.Grpc.Hubs
 
         #region GetUsers
 
-        public async Task<ChannelReader<User>> GetUsers(int count, CancellationToken cancellationToken)
+        public ChannelReader<User> GetUsers(int count, CancellationToken cancellationToken)
         {
-            var channel = Channel.CreateBounded<User>(5);
+            var channel = Channel.CreateBounded<User>(10);
 
-            await WriteUsers(channel.Writer, count, cancellationToken);
+            WriteUsers(channel.Writer, count, cancellationToken);
 
             return channel.Reader;
         }
 
+
         private async Task WriteUsers(ChannelWriter<User> channelWriter, int count, CancellationToken cancellationToken)
         {
-            for (int i = 0; i < count; i++)
+            Exception localException = null;
+
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var randomUser = await randomUserService.GetUser();
-                var result = randomUser.Results.FirstOrDefault();
-
-                var user = new User
+                for (int i = 0; i < count; i++)
                 {
-                    FirstName = result.Name.First,
-                    LastName = result.Name.Last,
-                    Title = result.Name.Title
-                };
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                await channelWriter.WriteAsync(user, cancellationToken);
+                    var user = await randomUserService.GetUser().ConfigureAwait(false);
+                    
+                    //logger.LogInformation("New user: {user}", user);
+
+                    await channelWriter.WriteAsync(user, cancellationToken);
+
+                    //await Task.Delay(50, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                var content = ex.InnerException is null ? ex.Message : ex.InnerException.Message;
+                logger.LogError(content);
+                localException = ex;               
+            }
+            finally
+            {
+                channelWriter.TryComplete(localException);
             }
         }
-
-        #endregion
     }
+
+    #endregion
 }
+

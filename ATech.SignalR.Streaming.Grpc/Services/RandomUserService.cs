@@ -4,12 +4,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using ATech.SignalR.Streaming.Grpc.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace ATech.SignalR.Streaming.Grpc.Services
 {
+    public record User
+    {
+        public string Title { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
     public interface IRandomUserService
     {
-        Task<RandomUser> GetUser(CancellationToken cancellationToken);
+        Task<User> GetUser(CancellationToken cancellationToken);
     }
 
     public class RandomUserService : IRandomUserService
@@ -27,18 +35,20 @@ namespace ATech.SignalR.Streaming.Grpc.Services
             options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
-        public async Task<RandomUser> GetUser(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<User> GetUser(CancellationToken cancellationToken = default(CancellationToken))
         {
             using var client = httpClientFactory.CreateClient();
-            using var response = await client.GetAsync("https://randomuser.me/api/", HttpCompletionOption.ResponseHeadersRead);
+            var response = await client.GetStringAsync("https://randomuser.me/api/");
 
-            response.EnsureSuccessStatusCode();
-
-            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-            var randomUser = await JsonSerializer.DeserializeAsync<RandomUser>(stream, options);
-
-            return randomUser;
+            var parsed = JObject.Parse(response);
+            var results = parsed["results"];
+            var name = results[0]["name"];
+            return new User
+            {
+                FirstName = name["first"].ToString(),
+                LastName = name["last"].ToString(),
+                Title = name["title"].ToString(),
+            };
         }
     }
 }

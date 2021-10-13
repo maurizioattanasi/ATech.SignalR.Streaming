@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -9,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace ATech.SignalR.Streaming.Grpc.Hubs
 {
     public class StreamHub : Hub
-    {
+    {       
         public ChannelReader<int> Counter(int count, int delay, CancellationToken cancellationToken)
         {
             var channel = Channel.CreateUnbounded<int>();

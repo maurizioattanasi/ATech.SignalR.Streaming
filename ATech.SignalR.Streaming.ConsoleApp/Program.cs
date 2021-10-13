@@ -9,7 +9,7 @@ namespace ATech.SignalR.Streaming.ConsoleApp
     {
         static async Task Main(string[] args)
         {
-            var url = "http://localhost:5000/streamHub";
+            var url = "https://localhost:5001/streamHub";
 
             var connection = new HubConnectionBuilder()
                 .WithUrl(url)
@@ -24,14 +24,22 @@ namespace ATech.SignalR.Streaming.ConsoleApp
                 await connection.StartAsync();
             };
 
-            var cancellationTokenSource = new CancellationTokenSource();
-            await connection.StartAsync(cancellationTokenSource.Token);
-
-            var channel = await connection.StreamAsChannelAsync<int>("Counter", 100, 1000, cancellationTokenSource.Token);
-            while (await channel.WaitToReadAsync(cancellationTokenSource.Token))
+            try
             {
-                while (channel.TryRead(out int data))
-                    Console.WriteLine($"Received: {data}");
+                var cancellationTokenSource = new CancellationTokenSource();
+
+                await connection.StartAsync(cancellationTokenSource.Token);
+
+                var channel = await connection.StreamAsChannelAsync<int>("Counter", 100, 1000, cancellationTokenSource.Token);
+                while (await channel.WaitToReadAsync(cancellationTokenSource.Token))
+                {
+                    while (channel.TryRead(out int data))
+                        Console.WriteLine($"Received: {data}");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
 
             Console.WriteLine("Hello, World!");
