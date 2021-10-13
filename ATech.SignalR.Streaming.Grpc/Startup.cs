@@ -20,9 +20,25 @@ namespace ATech.SignalR.Streaming.Grpc
         {
             services.AddHttpClient();
 
-            services.AddSignalR();
+            services.AddSignalR()
+                .AddHubOptions<StreamHub>(config =>
+                {
+                    config.EnableDetailedErrors = true;
+                })
+                .AddJsonProtocol(); ;
 
             services.AddScoped<RandomUserService>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .SetIsOriginAllowed(_ => true)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                );
+            });
 
             services.AddGrpc();
         }
@@ -37,16 +53,19 @@ namespace ATech.SignalR.Streaming.Grpc
 
             app.UseRouting();
 
+            app.UseCors("CorsPolicy");
+
             app.UseEndpoints(endpoints =>
             {
+                // endpoints.MapHub<ATechProcessHub>("/atechProcessHub");
+                endpoints.MapHub<StreamHub>("/streamHub");
+
                 endpoints.MapGrpcService<GreeterService>();
 
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
                 });
-
-                endpoints.MapHub<ATechProcessHub>("/atechProcessHub");
             });
         }
     }

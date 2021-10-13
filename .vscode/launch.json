@@ -3,7 +3,18 @@
     // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
     // Per altre informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [
+    "configurations": [               
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ATech.SignalR.Streaming.ConsoleApp/bin/Debug/net5.0/ATech.SignalR.Streaming.ConsoleApp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/ATech.SignalR.Streaming.ConsoleApp",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
         {
             "name": ".NET Core Launch (web)",
             "type": "coreclr",

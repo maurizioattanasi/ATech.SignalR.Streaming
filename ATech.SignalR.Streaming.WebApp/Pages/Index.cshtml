@@ -1,0 +1,55 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-6"></div>
+        <div class="col-6">
+            <input type="button" name="btnStream" value="Start Streaming" />
+        </div>
+    </div>
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+
+<script>
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:5001/streamHub")
+        .build();
+
+    function streamsCounter() {
+        connection.stream("Counter", 1000, 1).subscribe({
+            next: (item) => {
+                console.log(item);
+            },
+            complete: () => {
+                console.log("Done!");
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
+
+    };
+
+    setTimeout(() => {
+        streamsCounter();
+    }, 1000);
+
+    (async () => {
+        try {
+            await connection.start();
+        } catch (e) {
+            console.error(e.toString());
+        }
+    })();
+</script>

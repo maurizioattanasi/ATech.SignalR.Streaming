@@ -7,7 +7,6 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/ATech.SignalR.Streaming.Grpc/ATech.SignalR.Streaming.Grpc.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
